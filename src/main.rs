@@ -1,4 +1,5 @@
 mod ui;
+use crate::ui::state::App;
 use crate::ui::state::{run_app, ui};
 use crossterm::terminal;
 use crossterm::{
@@ -19,12 +20,16 @@ use tui::{
 
 fn main() -> Result<(),  Box<dyn Error>> {
     enable_raw_mode()?;
+
     let mut stdout = io::stdout();
+
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
+
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
-    
-    let res = run_app(&mut terminal);
+
+    let app = App::default();
+    let res = run_app(&mut terminal, app);
 
     disable_raw_mode()?;
     execute!(
@@ -33,7 +38,8 @@ fn main() -> Result<(),  Box<dyn Error>> {
         DisableMouseCapture
     )?;
     terminal.show_cursor()?;
-
+    
+    
     if let Err(err) = res {
         println!("{:?}", err)
     }
